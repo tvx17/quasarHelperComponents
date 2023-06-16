@@ -39,7 +39,7 @@ const c = async ({ destination, data, crudMode }) => {
     case crudModes.url:
       break;
     case crudModes.sequelize:
-      return await window.db.post(destination, data);
+      return await window.db.create(destination, data);
   }
 };
 const r = async ({ destination, query, crudMode } = {}) => {
@@ -69,7 +69,7 @@ const r = async ({ destination, query, crudMode } = {}) => {
         }
         return data;
       case crudModes.sequelize:
-        return await window.db.get(destination, query);
+        return await window.db.read(destination, query);
     }
   } catch (e) {
     return null;
@@ -84,7 +84,7 @@ const u = async ({ destination, data, crudMode }) => {
     case crudModes.url:
       break;
     case crudModes.sequelize:
-      return await window.db.put(destination, data);
+      return await window.db.update(destination, data);
   }
 };
 const d = async ({ destination, id, crudMode }) => {
