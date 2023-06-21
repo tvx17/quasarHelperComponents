@@ -18,7 +18,7 @@ import crud from "src/app/crud";
 
 // ********************************** Props ************************************
 const props = defineProps({
-  id: {type: Number, required: false, default: null}, // It is possible to give this component an ID. If this is the case, the corresponding data record is read from the data table, which is also to be transmitted, and written to the reactive variable datarow.
+  id: {type: Number, required: false, default: null}, // It is possible to give this component an ID. If this is the case, the corresponding data record is read from the data table, which is also to be transmitted, and written to the reactive variable dataRow.
   datatable: {type: String, required: true, default: null}, // The datatable where to count and search for data
 })
 

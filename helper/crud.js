@@ -1,8 +1,8 @@
 import { notifies } from './messages';
-import requests from './requests';
 import { strings } from './helper';
 
 import { api } from 'boot/axios';
+import { ref } from 'vue';
 
 const crudModes = {
   endpoint: 'endpoint',
@@ -10,9 +10,48 @@ const crudModes = {
   sequelize: 'sequelize',
 };
 
-let crudMode = '';
+let crudMode = ref('');
 
-const save = async ({ destination, data, options, crudMode }) => {
+const readAll = async ({ destination, overrideCrudMode }) => {
+  return await r({
+    destination: destination,
+    overrideCrudMode: overrideCrudMode,
+    query: { mode: 'readAll' },
+  });
+};
+const readFirst = async ({ destination, overrideCrudMode }) => {
+  return await r({
+    destination: destination,
+    overrideCrudMode: overrideCrudMode,
+    query: { mode: 'readFirst' },
+  });
+};
+const readAllByQuery = async ({ destination, overrideCrudMode }) => {
+  return await r({
+    destination: destination,
+    overrideCrudMode: overrideCrudMode,
+    query: { mode: 'readAllByQuery' },
+  });
+};
+const readByPk = async ({ destination, overrideCrudMode }) => {
+  return await r({
+    destination: destination,
+    overrideCrudMode: overrideCrudMode,
+    query: { mode: 'readByPk' },
+  });
+};
+const readCount = async ({ destination, overrideCrudMode }) => {
+  return await r({
+    destination: destination,
+    overrideCrudMode: overrideCrudMode,
+    query: { mode: 'readCount' },
+  });
+};
+
+const save = async ({ destination, data, options, overrideCrudMode }) => {
+  options = '';
+  overrideCrudMode = '';
+
   if (data.hasOwnProperty('id')) {
     try {
       await u(destination);
@@ -30,10 +69,10 @@ const save = async ({ destination, data, options, crudMode }) => {
   }
 };
 
-const c = async ({ destination, data, crudMode }) => {
-  crudMode = crudModeCheck(crudMode);
+const c = async ({ destination, data, crudMode: overrideCrudMode }) => {
+  let localCrudMode = crudModeCheck(overrideCrudMode);
   data = sanitizeData(data);
-  switch (crudMode) {
+  switch (overrideCrudMode) {
     case crudModes.endpoint:
       break;
     case crudModes.url:
@@ -42,15 +81,13 @@ const c = async ({ destination, data, crudMode }) => {
       return await window.db.create(destination, data);
   }
 };
-const r = async ({ destination, query, crudMode } = {}) => {
+const r = async ({ destination, query, crudMode: overrideCrudMode } = {}) => {
   let results;
-  crudMode = crudModeCheck(crudMode);
-
+  const localCrudMode = crudModeCheck(overrideCrudMode);
   try {
-    switch (crudMode) {
+    switch (localCrudMode) {
       case crudModes.endpoint:
         results = await api.get(destination, query);
-        console.log('-------------->', results);
         return results['data'];
       case crudModes.url:
         let url = query.hasOwnProperty('url') ? query['url'] : destination;
@@ -62,7 +99,6 @@ const r = async ({ destination, query, crudMode } = {}) => {
           url = strings.truncate(url, 1);
         }
         results = await api.get(url);
-        console.log('-------------->', results);
         const data = results['data'];
         if (query['limit'] > 0 && data.length > query['limit']) {
           data.length = query['limit'];
@@ -75,10 +111,10 @@ const r = async ({ destination, query, crudMode } = {}) => {
     return null;
   }
 };
-const u = async ({ destination, data, crudMode }) => {
-  crudMode = crudModeCheck(crudMode);
+const u = async ({ destination, data, overrideCrudMode }) => {
+  const localCrudMode = crudModeCheck(overrideCrudMode);
   data = sanitizeData(data);
-  switch (crudMode) {
+  switch (localCrudMode) {
     case crudModes.endpoint:
       break;
     case crudModes.url:
@@ -114,8 +150,8 @@ const crudModeCheck = (localCrudMode) => {
   ) {
     return localCrudMode;
   }
-  if (crudMode !== '') {
-    return crudMode;
+  if (crudMode.value !== '') {
+    return crudMode.value;
   }
   throw new Error('No valid crud mode');
 };
@@ -129,8 +165,33 @@ const methods = {
   create: c,
   r,
   read: r,
+  u,
+  update: u,
+  d,
+  delete: d,
+  readAll,
+  readFirst,
+  readAllByQuery,
+  readByPk,
+  readCount,
 };
 
 export default methods;
 
-export { crudModes, crudMode, methods, c, r, u, d, save };
+export {
+  crudModes,
+  crudMode,
+  methods,
+  c,
+  r,
+  u,
+  d,
+  save,
+  readAll,
+  readFirst,
+  readAllByQuery,
+  readByPk,
+  readCount,
+  count,
+  getAll,
+};
