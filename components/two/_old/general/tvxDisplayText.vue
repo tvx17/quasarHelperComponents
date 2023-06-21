@@ -1,7 +1,7 @@
 <template>
 <div class="row">
   <div :class="firstColumnWidth">{{props.label}}:</div>
-  <div class="col">{{props.value}}</div>
+  <div class="col">{{props.usernameOrEmail}}</div>
 </div>
 </template>
 

@@ -30,7 +30,7 @@ import {firstColumnWidth} from "src/app/definitions";
 const props = defineProps(
   {
     modelValue: {required: true},
-    label: {required: false, type: String, default: 'No value set'},
+    label: {required: false, type: String, default: 'No usernameOrEmail set'},
     activatedLabel: {required: false, type: String, default: 'on'},
     activatedIcon: {required: false, type: String, default: 'fa-regular fa-eye'},
     activatedString: {required: false, type: String, default: 'on'},

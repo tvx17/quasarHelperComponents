@@ -58,7 +58,7 @@ const emits = defineEmits(['update:modelValue']);
 
 
 const elementValue = computed({
-  get: () => props.modelValue, set: (value) => emits('update:modelValue', value)
+  get: () => props.modelValue, set: (usernameOrEmail) => emits('update:modelValue', value)
 })
 
 const hasError = ref(false);
