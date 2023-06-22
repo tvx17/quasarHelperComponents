@@ -3,7 +3,7 @@
     <div class="row">
       <div class="col">
         {{ props.label }}
-      </div>
+      </div>Hallo
       <div class="col">
         <q-input
           v-model="value"
