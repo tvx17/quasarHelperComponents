@@ -6,13 +6,39 @@
       </div>
       <div :class="'col-' + props.fieldColumnWidth">
         <q-input
-          v-model="value"
+          v-model="elementValue"
           dense
-          :disable="props.disable || !props.editable"
+          :label="$t('scheduler.startTime')"
           :rules="props.rules"
           :error-message="props.errorMessage !== '' ? props.errorMessage : ''"
           :error="props.errorMessage !== ''"
+          mask="time"
+          @blur="$emit('update:done')"
+          :disable="props.disable"
+          :counter="
+            elementValue && elementValue.length < 5 && elementValue.length > 5
+          "
         >
+          <template v-slot:append>
+            <q-icon class="cursor-pointer" name="access_time">
+              <q-popup-proxy
+                cover
+                transition-hide="scale"
+                transition-show="scale"
+              >
+                <q-time v-model="elementValue" format24h>
+                  <div class="row items-center justify-end">
+                    <q-btn
+                      v-close-popup
+                      color="primary"
+                      flat
+                      :label="$t('common.close')"
+                    />
+                  </div>
+                </q-time>
+              </q-popup-proxy>
+            </q-icon>
+          </template>
         </q-input>
       </div>
     </div>
@@ -31,19 +57,13 @@ const props = defineProps({
   rules: { required: false, type: Array, default: () => [] },
   errorMessage: { required: false, type: String },
   disable: { required: false, type: Boolean, default: false },
-  editable: { required: false, type: Boolean, default: true },
   labelColumnWidth: { required: false, type: Number, default: 3 },
   fieldColumnWidth: { required: false, type: Number, default: 9 },
 });
-const emits = defineEmits(['update:modelValue']);
+const emits = defineEmits(['update:modelValue', 'update:done']);
 
-const value = computed({
+const elementValue = computed({
   get: () => props.modelValue,
   set: (value) => emits('update:modelValue', value),
 });
-
-const onClick = () => {
-  overviewVisible.value = true;
-  selectedData.value = {};
-};
 </script>

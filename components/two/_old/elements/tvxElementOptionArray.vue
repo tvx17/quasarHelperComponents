@@ -22,7 +22,7 @@
                 v-for="(element, index) in props.labels"
                 v-bind:key="index"
                 :label="element"
-                @click="onSelect(index)"
+                @click="onSelectFirstSwitch(index)"
                 :color="elementValue[props.keys[index]] ? 'primary': 'white'"
                 :text-color="elementValue[props.keys[index]] ? 'white': 'black'"
                 size="sm"

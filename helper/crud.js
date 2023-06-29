@@ -49,32 +49,45 @@ const readCount = async ({ destination, overrideCrudMode }) => {
 };
 
 const save = async ({ destination, data, options, overrideCrudMode }) => {
-  options = '';
-  overrideCrudMode = '';
-
+  /*optionsElement = '';*/
   if (data.hasOwnProperty('id')) {
     try {
-      await u(destination);
+      await u({destination:destination, data:data, overrideCrudMode:overrideCrudMode});
       notifies.positive('Änderungen gespeichert!');
       return null;
     } catch (e) {
-      notifies.error(e);
+      notifies.axiosError(e);
     }
   } else {
     try {
-      const returnData = await c({ destination, data });
+      const returnData = await c({ destination: destination, data: data, overrideCrudMode: overrideCrudMode });
       notifies.positive('Neuen Datensatz gespeichert!');
       return returnData;
-    } catch (e) {}
+    } catch (e) {
+      notifies.axiosError(e)
+    }
   }
+};
+
+const buildUrl = (query, destination) => {
+  let url = query && query.hasOwnProperty('url') ? query['url'] : destination;
+  if (query && query['urlParams']) {
+    url += '?';
+    for (const [key, value] of Object.entries(query['urlParams'])) {
+      url += `${key}=${value}&`;
+    }
+    url = strings.truncate(url, 1);
+  }
+  return url;
 };
 
 const c = async ({ destination, data, crudMode: overrideCrudMode }) => {
   let localCrudMode = crudModeCheck(overrideCrudMode);
   data = sanitizeData(data);
-  switch (overrideCrudMode) {
+
+  switch (localCrudMode) {
     case crudModes.endpoint:
-      break;
+      return await api.post(destination, data);
     case crudModes.url:
       break;
     case crudModes.sequelize:
@@ -82,26 +95,37 @@ const c = async ({ destination, data, crudMode: overrideCrudMode }) => {
   }
 };
 const r = async ({ destination, query, crudMode: overrideCrudMode } = {}) => {
+  if (!destination) {
+    throw new Error('No destination given');
+  }
+
   let results;
   const localCrudMode = crudModeCheck(overrideCrudMode);
   try {
     switch (localCrudMode) {
       case crudModes.endpoint:
         results = await api.get(destination, query);
-        return results['data'];
-      case crudModes.url:
-        let url = query.hasOwnProperty('url') ? query['url'] : destination;
-        if (query['urlParams']) {
-          url += '?';
-          for (const [key, value] of Object.entries(query['urlParams'])) {
-            url += `${key}=${value}&`;
-          }
-          url = strings.truncate(url, 1);
+
+        if (results.hasOwnProperty('data')) {
+          results = results['data'];
         }
+        if(results.hasOwnProperty('value')) {
+          results = results['value'];
+        }
+        if (results.length === 1 && typeof results === 'object') {
+          results = results[0];
+        }
+
+        return results;
+      case crudModes.url:
+        let url = buildUrl(query, destination)
         results = await api.get(url);
-        const data = results['data'];
-        if (query['limit'] > 0 && data.length > query['limit']) {
+        let data = results.hasOwnProperty('data') ? results['data'] : results
+        if (query && query['limit'] > 0 && data.length > query['limit']) {
           data.length = query['limit'];
+        }
+        if (data.length === 1 && typeof data === 'object') {
+          data = data[0];
         }
         return data;
       case crudModes.sequelize:
@@ -116,6 +140,7 @@ const u = async ({ destination, data, overrideCrudMode }) => {
   data = sanitizeData(data);
   switch (localCrudMode) {
     case crudModes.endpoint:
+      const results = await api.patch(destination, data)
       break;
     case crudModes.url:
       break;
@@ -125,13 +150,18 @@ const u = async ({ destination, data, overrideCrudMode }) => {
 };
 const d = async ({ destination, id, crudMode }) => {
   crudMode = crudModeCheck(crudMode);
+  try {
   switch (crudMode) {
     case crudModes.endpoint:
       break;
     case crudModes.url:
-      break;
+      const url = buildUrl({ urlParams: { id: id } }, destination);
+      return await api.delete(url);
     case crudModes.sequelize:
       return await window.db.delete(destination, id);
+  }
+  } catch (e) {
+    return e
   }
 };
 
@@ -174,6 +204,7 @@ const methods = {
   readAllByQuery,
   readByPk,
   readCount,
+  save
 };
 
 export default methods;

@@ -1,7 +1,7 @@
 <template>
   <!--
     *********************************************************************************
-    If the summary prop is empty and also no data was found in the table, a message will be displayed
+    If the summary prop is empty and also no dataset was found in the table, a message will be displayed
     *********************************************************************************
     -->
   <span v-if="props.summary.length === 0 && dataCount === 0">
@@ -44,7 +44,7 @@
     The dialog to select a dataset from
     *********************************************************************************
   -->
-<!--  <tvx-button-data-selection-dialog
+<!--  <tvx-button-dataset-selection-dialog
     id=""
     is-visible=""
     datatable=""
@@ -57,7 +57,7 @@ import crud, { crudModes } from "src/tvx/helper/crud";
 
 // ********************************** Props ************************************
 const props = defineProps({
-  datatable: {type: String, required: true, default: null}, // The datatable where to count the data
+  datatable: {type: String, required: true, default: null}, // The datatable where to count the dataset
   summary: {type: String, required: true, default: ''}, // Summary of the dataset from the parent element
   id: {type: Number, required: true}, // Id of the dataset from the parent element
   tooltip: {type: String, required: false, default: 'Klicken, um weitere Datensätze anzuzeigen'}, // If there are more than one dataset in the datatable, this text will be displayed to give a hint, where to find more datasets

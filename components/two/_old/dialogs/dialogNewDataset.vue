@@ -9,7 +9,7 @@
     <q-card style="min-width: 50%">
       <q-card-section>
         <q-bar class="bg-white">
-          {{ props.headline }}
+          {{ props.title }}
           <q-space/>
           <q-btn class="on-right" icon="fa-solid fa-xmark" flat dense size="sm" @click="onCloseButtonClicked">
             <q-tooltip>
@@ -32,7 +32,7 @@ import formBooks from 'components/forms/formBook.vue'
 
 const props = defineProps({
   datatable: {type: String, required: true},
-  headline: {type: String, required: true, default: 'Neu'},
+  title: {type: String, required: true, default: 'Neu'},
   form: {type: String, required: true},
   isVisible: {type: Boolean, required: true, default: false}
 })

@@ -5,15 +5,12 @@
         {{ props.label }}
       </div>
       <div :class="'col-' + props.fieldColumnWidth">
-        <q-input
+        <q-option-group
           v-model="value"
-          dense
-          :disable="props.disable || !props.editable"
-          :rules="props.rules"
-          :error-message="props.errorMessage !== '' ? props.errorMessage : ''"
-          :error="props.errorMessage !== ''"
-        >
-        </q-input>
+          :options="props.options"
+          color="yellow"
+          type="toggle"
+        />
       </div>
     </div>
   </div>
@@ -32,6 +29,7 @@ const props = defineProps({
   errorMessage: { required: false, type: String },
   disable: { required: false, type: Boolean, default: false },
   editable: { required: false, type: Boolean, default: true },
+  options: { required: false, type: Array, default: () => [] },
   labelColumnWidth: { required: false, type: Number, default: 3 },
   fieldColumnWidth: { required: false, type: Number, default: 9 },
 });
@@ -42,8 +40,5 @@ const value = computed({
   set: (value) => emits('update:modelValue', value),
 });
 
-const onClick = () => {
-  overviewVisible.value = true;
-  selectedData.value = {};
-};
+const onClick = () => {};
 </script>

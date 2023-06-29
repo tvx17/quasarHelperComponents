@@ -5,15 +5,7 @@
         {{ props.label }}
       </div>
       <div :class="'col-' + props.fieldColumnWidth">
-        <q-input
-          v-model="value"
-          dense
-          :disable="props.disable || !props.editable"
-          :rules="props.rules"
-          :error-message="props.errorMessage !== '' ? props.errorMessage : ''"
-          :error="props.errorMessage !== ''"
-        >
-        </q-input>
+        <q-toggle v-model="value" />
       </div>
     </div>
   </div>
@@ -35,15 +27,24 @@ const props = defineProps({
   labelColumnWidth: { required: false, type: Number, default: 3 },
   fieldColumnWidth: { required: false, type: Number, default: 9 },
 });
-const emits = defineEmits(['update:modelValue']);
+const emits = defineEmits([
+  'update:modelValue',
+  'action:setTrue',
+  'action:setFalse',
+]);
 
 const value = computed({
   get: () => props.modelValue,
-  set: (value) => emits('update:modelValue', value),
+  set: (value) => {
+    emits('update:modelValue', value);
+    if(value) {
+      emits('action:setTrue');
+    }
+    if(!value) {
+      emits('action:setFalse');
+    }
+  },
 });
 
-const onClick = () => {
-  overviewVisible.value = true;
-  selectedData.value = {};
-};
+const onClick = () => {};
 </script>

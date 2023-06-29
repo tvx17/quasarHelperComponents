@@ -46,7 +46,7 @@ const elementValue = computed({
   get: () => props.modelValue, set: (usernameOrEmail) => emits('update:modelValue', value)
 })
 
-const options = ref([]);
+const optionsElement = ref([]);
 
 const onClick = () => {
   overviewVisible.value = true;

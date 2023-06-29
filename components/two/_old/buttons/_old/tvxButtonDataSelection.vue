@@ -88,7 +88,7 @@ const newDatasetCreated = (id) => {
 }
 
 const load = async (id = null) => {
-  let data = null
+  let dataset = null
   if (id != null) {
     data = await crud.r({table: props.datatable, id: id})
   } else {

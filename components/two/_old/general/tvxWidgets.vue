@@ -4,7 +4,7 @@
       <paf-widget-data-display
         :request="widget.request"
         :table="widget.table"
-        :headline="widget.headline"
+        :headline="widget.title"
       />
     </div>
   </div>
