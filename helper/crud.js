@@ -33,11 +33,11 @@ const readAllByQuery = async ({ destination, overrideCrudMode }) => {
     query: { mode: 'readAllByQuery' },
   });
 };
-const readByPk = async ({ destination, overrideCrudMode }) => {
+const readByPk = async ({ destination, pkValue, overrideCrudMode }) => {
   return await r({
     destination: destination,
     overrideCrudMode: overrideCrudMode,
-    query: { mode: 'readByPk' },
+    query: { mode: 'readByPk', id: pkValue },
   });
 };
 const readCount = async ({ destination, overrideCrudMode }) => {
@@ -52,7 +52,11 @@ const save = async ({ destination, data, options, overrideCrudMode }) => {
   /*optionsElement = '';*/
   if (data.hasOwnProperty('id')) {
     try {
-      await u({destination:destination, data:data, overrideCrudMode:overrideCrudMode});
+      await u({
+        destination: destination,
+        data: data,
+        overrideCrudMode: overrideCrudMode,
+      });
       notifies.positive('Änderungen gespeichert!');
       return null;
     } catch (e) {
@@ -60,11 +64,15 @@ const save = async ({ destination, data, options, overrideCrudMode }) => {
     }
   } else {
     try {
-      const returnData = await c({ destination: destination, data: data, overrideCrudMode: overrideCrudMode });
+      const returnData = await c({
+        destination: destination,
+        data: data,
+        overrideCrudMode: overrideCrudMode,
+      });
       notifies.positive('Neuen Datensatz gespeichert!');
       return returnData;
     } catch (e) {
-      notifies.axiosError(e)
+      notifies.axiosError(e);
     }
   }
 };
@@ -109,7 +117,7 @@ const r = async ({ destination, query, crudMode: overrideCrudMode } = {}) => {
         if (results.hasOwnProperty('data')) {
           results = results['data'];
         }
-        if(results.hasOwnProperty('value')) {
+        if (results.hasOwnProperty('value')) {
           results = results['value'];
         }
         if (results.length === 1 && typeof results === 'object') {
@@ -118,9 +126,9 @@ const r = async ({ destination, query, crudMode: overrideCrudMode } = {}) => {
 
         return results;
       case crudModes.url:
-        let url = buildUrl(query, destination)
+        let url = buildUrl(query, destination);
         results = await api.get(url);
-        let data = results.hasOwnProperty('data') ? results['data'] : results
+        let data = results.hasOwnProperty('data') ? results['data'] : results;
         if (query && query['limit'] > 0 && data.length > query['limit']) {
           data.length = query['limit'];
         }
@@ -140,7 +148,7 @@ const u = async ({ destination, data, overrideCrudMode }) => {
   data = sanitizeData(data);
   switch (localCrudMode) {
     case crudModes.endpoint:
-      const results = await api.patch(destination, data)
+      const results = await api.patch(destination, data);
       break;
     case crudModes.url:
       break;
@@ -151,17 +159,17 @@ const u = async ({ destination, data, overrideCrudMode }) => {
 const d = async ({ destination, id, crudMode }) => {
   crudMode = crudModeCheck(crudMode);
   try {
-  switch (crudMode) {
-    case crudModes.endpoint:
-      break;
-    case crudModes.url:
-      const url = buildUrl({ urlParams: { id: id } }, destination);
-      return await api.delete(url);
-    case crudModes.sequelize:
-      return await window.db.delete(destination, id);
-  }
+    switch (crudMode) {
+      case crudModes.endpoint:
+        break;
+      case crudModes.url:
+        const url = buildUrl({ urlParams: { id: id } }, destination);
+        return await api.delete(url);
+      case crudModes.sequelize:
+        return await window.db.delete(destination, id);
+    }
   } catch (e) {
-    return e
+    return e;
   }
 };
 
@@ -204,7 +212,7 @@ const methods = {
   readAllByQuery,
   readByPk,
   readCount,
-  save
+  save,
 };
 
 export default methods;

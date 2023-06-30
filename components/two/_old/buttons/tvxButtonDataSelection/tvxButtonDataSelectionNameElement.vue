@@ -69,7 +69,7 @@ const dialogIsVisible = ref(false) // A surrogate of the visibility of the dialo
 
 
 // ********************************** Methods **********************************
-const onDatasetSelected = (id) => {
+const onDatasetSelected = (currentEditId) => {
   emits('on:datasetSelected', id)
 }
 const selectNewDataset = () => {

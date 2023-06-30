@@ -77,17 +77,17 @@ watch(() => props.id, (newId) => {
   load(newId)
 })
 
-const onDatasetSelected = async(id) => {
+const onDatasetSelected = async(currentEditId) => {
   await load(id)
   emits('on:datasetSelected', id)
 }
 
-const newDatasetCreated = (id) => {
+const newDatasetCreated = (currentEditId) => {
   emits('done:action', id)
   load(id)
 }
 
-const load = async (id = null) => {
+const load = async (currentEditId = null) => {
   let dataset = null
   if (id != null) {
     data = await crud.r({table: props.datatable, id: id})
