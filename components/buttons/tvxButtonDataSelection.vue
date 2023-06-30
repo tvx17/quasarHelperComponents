@@ -30,7 +30,7 @@ const props = defineProps({
 });
 
 // ********************************** Emits ************************************
-/*const emits = defineEmits(['on:updated'])*/
+/*const emit = defineEmits(['on:updated'])*/
 
 const target = ref(null);
 

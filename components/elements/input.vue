@@ -6,10 +6,10 @@
       </div>
       <div :class="'col-' + props.fieldColumnWidth">
         <q-input
+          @blur="emit('on:blur')"
           v-model="value"
           dense
           :disable="props.disable || !props.editable"
-          :rules="props.rules"
           :error-message="props.errorMessage !== '' ? props.errorMessage : ''"
           :error="props.errorMessage !== ''"
         >
@@ -28,18 +28,17 @@ const { t } = useI18n();
 const props = defineProps({
   modelValue: { required: true },
   label: { required: true, type: String },
-  rules: { required: false, type: Array, default: () => [] },
-  errorMessage: { required: false, type: String },
+  errorMessage: { required: false, type: String, default:'' },
   disable: { required: false, type: Boolean, default: false },
   editable: { required: false, type: Boolean, default: true },
   labelColumnWidth: { required: false, type: Number, default: 3 },
   fieldColumnWidth: { required: false, type: Number, default: 9 },
 });
-const emits = defineEmits(['update:modelValue']);
+const emit = defineEmits(['update:modelValue','on:blur']);
 
 const value = computed({
   get: () => props.modelValue,
-  set: (value) => emits('update:modelValue', value),
+  set: (value) => emit('update:modelValue', value),
 });
 
 const onClick = () => {
