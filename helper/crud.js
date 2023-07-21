@@ -209,6 +209,7 @@ const crudModeCheck = (localCrudMode) => {
 };
 
 const sanitizeData = (data) => {
+  if(!data) return
   if(data.hasOwnProperty('isActive')) {
     data.isActive = data.isActive ? 1 : 0
   }

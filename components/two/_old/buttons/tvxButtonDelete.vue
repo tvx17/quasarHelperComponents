@@ -15,7 +15,7 @@ import {api} from 'boot/axios';
 import {dialogs, notifies} from 'src/app/messages';
 import {overviewVisible, selectedData} from 'src/app/store';
 import {useI18n} from "vue-i18n";
-import accessRights from "src/app/accessRights";
+/*import accessRights from "src/app/accessRights";*/
 
 const {t} = useI18n({useScope: 'global'});
 
