@@ -27,8 +27,8 @@
 
 <script setup>
 import {onMounted, ref, watch} from "vue";
-import formProject from 'components/forms/formProject.vue'
-import formBooks from 'components/forms/formBook.vue'
+import formProject from 'src/content/forms/formProject.vue'
+import formBooks from 'src/content/forms/formBook.vue'
 
 const props = defineProps({
   datatable: {type: String, required: true},

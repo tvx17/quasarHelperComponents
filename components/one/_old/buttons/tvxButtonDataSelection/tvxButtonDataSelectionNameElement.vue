@@ -9,7 +9,7 @@
   </span>
   <!--
     *********************************************************************************
-    There is exactly one dataset in the datatable. In this case no more datasets can be displayed in a selection dialog. Instead of a button a simple text message with the current summary will be displayed
+    There is exactly one dataset in the datatable. In this case no more datasets can be displayed in a selection dialog. Instead of a button a tree text message with the current summary will be displayed
     *********************************************************************************
   -->
   <span v-if="dataCount === 1">

@@ -34,11 +34,17 @@ const readAllByQuery = async ({ destination, overrideCrudMode }) => {
   });
 };
 const readByPk = async ({ destination, pkValue, overrideCrudMode }) => {
-  return await r({
+  const result = await r({
     destination: destination,
     overrideCrudMode: overrideCrudMode,
     query: { mode: 'readByPk', id: pkValue },
-  });
+  })
+
+  if(result.hasOwnProperty('isActive')) {
+    result.isActive = result.isActive === 1
+  }
+
+  return result
 };
 const readCount = async ({ destination, overrideCrudMode }) => {
   return await r({
@@ -50,8 +56,10 @@ const readCount = async ({ destination, overrideCrudMode }) => {
 
 const save = async ({ destination, data, options, overrideCrudMode }) => {
   /*optionsElement = '';*/
+  console.log('No doing savi', data)
   if (data.hasOwnProperty('id')) {
     try {
+      console.log('ÄNDERUNG')
       await u({
         destination: destination,
         data: data,
@@ -64,6 +72,7 @@ const save = async ({ destination, data, options, overrideCrudMode }) => {
     }
   } else {
     try {
+      console.log('NEU')
       const returnData = await c({
         destination: destination,
         data: data,
@@ -93,6 +102,8 @@ const c = async ({ destination, data, crudMode: overrideCrudMode }) => {
   let localCrudMode = crudModeCheck(overrideCrudMode);
   data = sanitizeData(data);
 
+    console.log('BIST DU AUCH HIER')
+
   switch (localCrudMode) {
     case crudModes.endpoint:
       return await api.post(destination, data);
@@ -103,6 +114,7 @@ const c = async ({ destination, data, crudMode: overrideCrudMode }) => {
   }
 };
 const r = async ({ destination, query, crudMode: overrideCrudMode } = {}) => {
+  query = sanitizeData(query)
   if (!destination) {
     throw new Error('No destination given');
   }
@@ -146,6 +158,7 @@ const r = async ({ destination, query, crudMode: overrideCrudMode } = {}) => {
 const u = async ({ destination, data, overrideCrudMode }) => {
   const localCrudMode = crudModeCheck(overrideCrudMode);
   data = sanitizeData(data);
+  console.log('UPPI', data)
   switch (localCrudMode) {
     case crudModes.endpoint:
       const results = await api.patch(destination, data);
@@ -153,6 +166,7 @@ const u = async ({ destination, data, overrideCrudMode }) => {
     case crudModes.url:
       break;
     case crudModes.sequelize:
+      console.log('SEUI')
       return await window.db.update(destination, data);
   }
 };
@@ -195,6 +209,9 @@ const crudModeCheck = (localCrudMode) => {
 };
 
 const sanitizeData = (data) => {
+  if(data.hasOwnProperty('isActive')) {
+    data.isActive = data.isActive ? 1 : 0
+  }
   return JSON.parse(JSON.stringify(data));
 };
 

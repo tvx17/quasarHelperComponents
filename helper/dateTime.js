@@ -1,3 +1,9 @@
+
+const dateTime = {
+
+}
+
+
 const time = {
   now: (asString = false) => {
     const now = new Date();

@@ -2,7 +2,7 @@
   <q-btn
     :label="props.buttonText"
     class="full-width"
-    color="positive"
+    color="negative"
     dense
     flat
     rounded
@@ -15,7 +15,7 @@ const props = defineProps({
   buttonText: {
     type: String,
     required: false,
-    default: 'Speichern',
+    default: 'Abbruch',
   },
   showIcon: {
     type: Boolean,
