@@ -171,6 +171,7 @@ const u = async ({ destination, data, overrideCrudMode }) => {
   }
 };
 const d = async ({ destination, id, crudMode }) => {
+  console.log('Hier', destination, id, crudMode)
   crudMode = crudModeCheck(crudMode);
   try {
     switch (crudMode) {
