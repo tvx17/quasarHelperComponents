@@ -1,8 +1,8 @@
-import { notifies } from './messages';
-import { strings } from './helper';
+import {notifies} from './messages';
+import {strings} from './helper';
 
-import { api } from 'boot/axios';
-import { ref } from 'vue';
+import {api} from 'boot/axios';
+import {ref} from 'vue';
 
 const crudModes = {
   endpoint: 'endpoint',
@@ -12,73 +12,94 @@ const crudModes = {
 
 let crudMode = ref('');
 
-const readAll = async ({ destination, overrideCrudMode }) => {
-  return await r({
-    destination: destination,
-    overrideCrudMode: overrideCrudMode,
-    query: { mode: 'readAll' },
-  });
-};
-const readFirst = async ({ destination, overrideCrudMode }) => {
-  return await r({
-    destination: destination,
-    overrideCrudMode: overrideCrudMode,
-    query: { mode: 'readFirst' },
-  });
-};
-const readAllByQuery = async ({ destination, overrideCrudMode }) => {
-  return await r({
-    destination: destination,
-    overrideCrudMode: overrideCrudMode,
-    query: { mode: 'readAllByQuery' },
-  });
-};
-const readByPk = async ({ destination, pkValue, overrideCrudMode }) => {
-  const result = await r({
-    destination: destination,
-    overrideCrudMode: overrideCrudMode,
-    query: { mode: 'readByPk', id: pkValue },
-  })
-
-  if(result.hasOwnProperty('isActive')) {
-    result.isActive = result.isActive === 1
+const readChecks = (results) => {
+  if (results.hasOwnProperty('data')) {
+    results = results['data'];
+  }
+  if (results.hasOwnProperty('value')) {
+    results = results['value'];
   }
 
-  return result
-};
-const readCount = async ({ destination, overrideCrudMode }) => {
+  for (const result of results) {
+    if (result.hasOwnProperty('isActive')) {
+      result.isActive = result.isActive === 1
+    }
+  }
+  if (results.length === 1 && typeof results === 'object') {
+    results = results[0];
+  }
+
+  return results
+}
+
+const helper = {}
+
+
+const readAll = async ({destination, overrideCrudMode}) => {
   return await r({
     destination: destination,
     overrideCrudMode: overrideCrudMode,
-    query: { mode: 'readCount' },
+    query: {mode: 'readAll'},
+  });
+};
+const readFirst = async ({destination, overrideCrudMode}) => {
+  return await r({
+    destination: destination,
+    overrideCrudMode: overrideCrudMode,
+    query: {mode: 'readFirst'},
+  });
+};
+const readAllByQuery = async ({destination, overrideCrudMode}) => {
+  return await r({
+    destination: destination,
+    overrideCrudMode: overrideCrudMode,
+    query: {mode: 'readAllByQuery'},
+  });
+};
+const readByPk = async ({destination, pkValue, overrideCrudMode}) => {
+  return await r({
+    destination: destination,
+    overrideCrudMode: overrideCrudMode,
+    query: {mode: 'readByPk', id: pkValue},
+  })
+};
+const readByColumnId = async ({destination, column, value, overrideCrudMode}) => {
+  return await r({
+    destination: destination,
+    overrideCrudMode: overrideCrudMode,
+    query: {mode: 'readByColumnId', where: {[column]: value}}
+  });
+}
+const readCount = async ({destination, overrideCrudMode}) => {
+  return await r({
+    destination: destination,
+    overrideCrudMode: overrideCrudMode,
+    query: {mode: 'readCount'},
   });
 };
 
-const save = async ({ destination, data, options, overrideCrudMode }) => {
+const save = async ({destination, data, options, overrideCrudMode}) => {
   /*optionsElement = '';*/
-  console.log('No doing savi', data)
   if (data.hasOwnProperty('id')) {
     try {
-      console.log('ÄNDERUNG')
       await u({
         destination: destination,
         data: data,
         overrideCrudMode: overrideCrudMode,
       });
-      notifies.positive('Änderungen gespeichert!');
+      notifies.positive('Changes where saved!');
       return null;
     } catch (e) {
       notifies.axiosError(e);
     }
   } else {
     try {
-      console.log('NEU')
       const returnData = await c({
         destination: destination,
         data: data,
         overrideCrudMode: overrideCrudMode,
       });
-      notifies.positive('Neuen Datensatz gespeichert!');
+      notifies.positive('New dataset was saved!');
       return returnData;
     } catch (e) {
       notifies.axiosError(e);
@@ -98,11 +119,9 @@ const buildUrl = (query, destination) => {
   return url;
 };
 
-const c = async ({ destination, data, crudMode: overrideCrudMode }) => {
+const c = async ({destination, data, crudMode: overrideCrudMode}) => {
   let localCrudMode = crudModeCheck(overrideCrudMode);
   data = sanitizeData(data);
-
-    console.log('BIST DU AUCH HIER')
 
   switch (localCrudMode) {
     case crudModes.endpoint:
@@ -113,7 +132,7 @@ const c = async ({ destination, data, crudMode: overrideCrudMode }) => {
       return await window.db.create(destination, data);
   }
 };
-const r = async ({ destination, query, crudMode: overrideCrudMode } = {}) => {
+const r = async ({destination, query, crudMode: overrideCrudMode} = {}) => {
   query = sanitizeData(query)
   if (!destination) {
     throw new Error('No destination given');
@@ -124,41 +143,20 @@ const r = async ({ destination, query, crudMode: overrideCrudMode } = {}) => {
   try {
     switch (localCrudMode) {
       case crudModes.endpoint:
-        results = await api.get(destination, query);
-
-        if (results.hasOwnProperty('data')) {
-          results = results['data'];
-        }
-        if (results.hasOwnProperty('value')) {
-          results = results['value'];
-        }
-        if (results.length === 1 && typeof results === 'object') {
-          results = results[0];
-        }
-
-        return results;
+        return readChecks(await api.get(destination, query))
       case crudModes.url:
         let url = buildUrl(query, destination);
-        results = await api.get(url);
-        let data = results.hasOwnProperty('data') ? results['data'] : results;
-        if (query && query['limit'] > 0 && data.length > query['limit']) {
-          data.length = query['limit'];
-        }
-        if (data.length === 1 && typeof data === 'object') {
-          data = data[0];
-        }
-        return data;
+        return readChecks(await api.get(url))
       case crudModes.sequelize:
-        return await window.db.read(destination, query);
+        return readChecks(await window.db.read(destination, query));
     }
   } catch (e) {
     return null;
   }
 };
-const u = async ({ destination, data, overrideCrudMode }) => {
+const u = async ({destination, data, overrideCrudMode}) => {
   const localCrudMode = crudModeCheck(overrideCrudMode);
   data = sanitizeData(data);
-  console.log('UPPI', data)
   switch (localCrudMode) {
     case crudModes.endpoint:
       const results = await api.patch(destination, data);
@@ -166,19 +164,17 @@ const u = async ({ destination, data, overrideCrudMode }) => {
     case crudModes.url:
       break;
     case crudModes.sequelize:
-      console.log('SEUI')
       return await window.db.update(destination, data);
   }
 };
-const d = async ({ destination, id, crudMode }) => {
-  console.log('Hier', destination, id, crudMode)
+const d = async ({destination, id, crudMode}) => {
   crudMode = crudModeCheck(crudMode);
   try {
     switch (crudMode) {
       case crudModes.endpoint:
         break;
       case crudModes.url:
-        const url = buildUrl({ urlParams: { id: id } }, destination);
+        const url = buildUrl({urlParams: {id: id}}, destination);
         return await api.delete(url);
       case crudModes.sequelize:
         return await window.db.delete(destination, id);
@@ -189,9 +185,12 @@ const d = async ({ destination, id, crudMode }) => {
 };
 
 // ----------------------------------------------------------------------------------------------------------
-const count = async () => {};
-const getAll = async () => {};
-const getById = async () => {};
+const count = async () => {
+};
+const getAll = async () => {
+};
+const getById = async () => {
+};
 
 // ----------------------------------------------------------------------------------------------------------
 
@@ -210,8 +209,8 @@ const crudModeCheck = (localCrudMode) => {
 };
 
 const sanitizeData = (data) => {
-  if(!data) return
-  if(data.hasOwnProperty('isActive')) {
+  if (!data) return
+  if (data.hasOwnProperty('isActive')) {
     data.isActive = data.isActive ? 1 : 0
   }
   return JSON.parse(JSON.stringify(data));
@@ -228,6 +227,7 @@ const methods = {
   delete: d,
   readAll,
   readFirst,
+  readByColumnId,
   readAllByQuery,
   readByPk,
   readCount,
@@ -252,4 +252,5 @@ export {
   readCount,
   count,
   getAll,
+  readByColumnId
 };
