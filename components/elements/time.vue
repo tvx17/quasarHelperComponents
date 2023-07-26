@@ -8,7 +8,7 @@
         <q-input
           v-model="elementValue"
           dense
-          :label="$t('scheduler.startTime')"
+          :label="props.label"
           :rules="props.rules"
           :error-message="props.errorMessage !== '' ? props.errorMessage : ''"
           :error="props.errorMessage !== ''"
@@ -32,7 +32,7 @@
                       v-close-popup
                       color="primary"
                       flat
-                      :label="$t('common.close')"
+                      :label="props.labelClose"
                     />
                   </div>
                 </q-time>
@@ -46,10 +46,8 @@
 </template>
 
 <script setup>
-import { useI18n } from 'vue-i18n';
 import { computed } from 'vue';
 
-const { t } = useI18n();
 
 const props = defineProps({
   modelValue: { required: true },
@@ -59,6 +57,7 @@ const props = defineProps({
   disable: { required: false, type: Boolean, default: false },
   labelColumnWidth: { required: false, type: Number, default: 3 },
   fieldColumnWidth: { required: false, type: Number, default: 9 },
+  labelClose: { required: false, type: String, default: 'Close' },
 });
 const emits = defineEmits(['update:modelValue', 'update:done']);
 

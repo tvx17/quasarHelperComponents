@@ -12,22 +12,37 @@ const crudModes = {
 
 let crudMode = ref('');
 
-const readChecks = (results) => {
-  if (results.hasOwnProperty('data')) {
-    results = results['data'];
-  }
-  if (results.hasOwnProperty('value')) {
-    results = results['value'];
-  }
-
-  for (const result of results) {
-    if (result.hasOwnProperty('isActive')) {
-      result.isActive = result.isActive === 1
+const propsCheck = (data, type) => {
+  if (type === 'read') {
+    if (data.hasOwnProperty('isActive')) {
+      data.isActive = data.isActive === 1
     }
   }
-  if (results.length === 1 && typeof results === 'object') {
-    results = results[0];
+  return data
+}
+
+const readChecks = (results) => {
+  console.log('ReadChecks', results);
+  if (results.hasOwnProperty('data')) {
+    console.log('Hat Data')
+    results = results['data'];
+    console.log(results)
   }
+  if (results.hasOwnProperty('value')) {
+    console.log('Hat Value')
+    results = results['value'];
+    console.log(results)
+  }
+
+  if (results.constructor === Array) {
+    for (const result of results) {
+      propsCheck(result, 'read');
+    }
+    if (results.length === 1) {
+      results = results[0];
+    }
+  }
+
 
   return results
 }
@@ -143,11 +158,14 @@ const r = async ({destination, query, crudMode: overrideCrudMode} = {}) => {
   try {
     switch (localCrudMode) {
       case crudModes.endpoint:
+        console.log('r, endpoint');
         return readChecks(await api.get(destination, query))
       case crudModes.url:
+        console.log('r, url');
         let url = buildUrl(query, destination);
         return readChecks(await api.get(url))
       case crudModes.sequelize:
+        console.log('r, sequelize');
         return readChecks(await window.db.read(destination, query));
     }
   } catch (e) {
