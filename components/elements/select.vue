@@ -9,6 +9,7 @@
           No selectable data was found or loaded! Options are
           {{ props.options }}
         </div>
+        {{props.options}} - {{props.optionLabel}} - {{props.optionValue}}
         <div v-if="optionsElement">
           <q-select
             v-model="elementValue"
