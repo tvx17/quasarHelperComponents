@@ -55,7 +55,7 @@ const props = defineProps(
     label: {required: true, type: String},
     checkError: {required: false, type: Boolean, default: false},
     data: {required: false, type: Object},
-    returnType: {required: false, type: String, default: 'negative'}
+    return: {required: false, type: String, default: 'negative'}
   }
 );
 const emits = defineEmits(['update:modelValue']);
