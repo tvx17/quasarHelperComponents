@@ -29,15 +29,15 @@
 </template>
 
 <script setup>
-import { computed, ref, watch } from "vue";
+import {computed, onMounted, ref, watch} from 'vue';
 
 const selectedValue = ref('high');
 
 const props = defineProps({
   modelValue: { required: true },
   label: { required: true, type: String },
-  activatedLabel: { required: false, type: String, default: '' },
-  deactivatedLabel: { required: false, type: String, default: '' },
+  activatedLabel: { required: false, type: String, default: 'activated' },
+  deactivatedLabel: { required: false, type: String, default: 'deactivated' },
   labelColumnWidth: { required: false, type: Number, default: 3 },
   fieldColumnWidth: { required: false, type: Number, default: 9 },
 });
@@ -61,4 +61,6 @@ watch(()=>elementValue.value, (newValue) => {
 const onSelect = () => {
   elementValue.value = !elementValue.value;
 };
+onMounted(()=> {
+})
 </script>

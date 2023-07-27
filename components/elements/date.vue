@@ -30,10 +30,10 @@
                 <q-date
                   v-model="elementValue"
                   :locale="{
-                    days: days,
-                    daysShort: daysShort,
-                    months: months,
-                    monthsShort: monthsShort,
+                    days: props.labelDays,
+                    daysShort: props.labelDaysShort,
+                    months: props.labelMonths,
+                    monthsShort: props.labelMonthsShort
                   }"
                   first-day-of-week="0"
                   mask="YYYY-MM-DD"
@@ -42,7 +42,7 @@
                   <div class="row items-center justify-end">
                     <q-btn
                       v-close-popup
-                      :label="$t('common.close')"
+                      :label="props.labelClose"
                       color="primary"
                       flat
                     />
@@ -58,10 +58,7 @@
 </template>
 
 <script setup>
-import { useI18n } from 'vue-i18n';
-import { computed, ref } from 'vue';
-
-const { t } = useI18n();
+import { computed } from 'vue';
 
 const props = defineProps({
   modelValue: { required: true },
@@ -71,55 +68,13 @@ const props = defineProps({
   disable: { required: false, type: Boolean, default: false },
   labelColumnWidth: { required: false, type: Number, default: 3 },
   fieldColumnWidth: { required: false, type: Number, default: 9 },
+  labelDays: { required: false, type: Array, default: () => ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'] },
+  labelDaysShort: { required: false, type: Array, default: () => ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'] },
+  labelMonths: { required: false, type: Array, default: () => ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'] },
+  labelMonthsShort: { required: false, type: Array, default: () => ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'] },
+  labelClose: { required: false, type: String , default: 'Close' },
 });
 const emits = defineEmits(['update:modelValue', 'update:done']);
-
-const days = [
-  t('dateTime.weekdays.monday'),
-  t('dateTime.weekdays.tuesday'),
-  t('dateTime.weekdays.wednesday'),
-  t('dateTime.weekdays.thursday'),
-  t('dateTime.weekdays.friday'),
-  t('dateTime.weekdays.saturday'),
-  t('dateTime.weekdays.sunday'),
-];
-const daysShort = [
-  t('dateTime.weekdays.mondayShort'),
-  t('dateTime.weekdays.tuesdayShort'),
-  t('dateTime.weekdays.wednesdayShort'),
-  t('dateTime.weekdays.thursdayShort'),
-  t('dateTime.weekdays.fridayShort'),
-  t('dateTime.weekdays.saturdayShort'),
-  t('dateTime.weekdays.sundayShort'),
-];
-const months = [
-  t('dateTime.months.january'),
-  t('dateTime.months.february'),
-  t('dateTime.months.march'),
-  t('dateTime.months.april'),
-  t('dateTime.months.may'),
-  t('dateTime.months.june'),
-  t('dateTime.months.july'),
-  t('dateTime.months.august'),
-  t('dateTime.months.september'),
-  t('dateTime.months.october'),
-  t('dateTime.months.november'),
-  t('dateTime.months.december'),
-];
-const monthsShort = [
-  t('dateTime.months.januaryShort'),
-  t('dateTime.months.februaryShort'),
-  t('dateTime.months.marchShort'),
-  t('dateTime.months.aprilShort'),
-  t('dateTime.months.mayShort'),
-  t('dateTime.months.juneShort'),
-  t('dateTime.months.julyShort'),
-  t('dateTime.months.augustShort'),
-  t('dateTime.months.septemberShort'),
-  t('dateTime.months.octoberShort'),
-  t('dateTime.months.novemberShort'),
-  t('dateTime.months.decemberShort'),
-];
 
 const elementValue = computed({
   get: () => props.modelValue,

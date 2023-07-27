@@ -12,22 +12,32 @@ const crudModes = {
 
 let crudMode = ref('');
 
-const readChecks = (results) => {
-    if (results.hasOwnProperty('data')) {
-        results = results['data'];
+const propsCheck = (data, type) => {
+  if (type === 'read') {
+    if (data.hasOwnProperty('isActive')) {
+      data.isActive = data.isActive === 1
     }
-    if (results.hasOwnProperty('value')) {
-        results = results['value'];
-    }
+  }
+  return data
+}
 
+const readChecks = (results) => {
+  if (results.hasOwnProperty('data')) {
+    results = results['data'];
+  }
+  if (results.hasOwnProperty('value')) {
+    results = results['value'];
+  }
+
+  if (results.constructor === Array) {
     for (const result of results) {
-        if (result.hasOwnProperty('isActive')) {
-            result.isActive = result.isActive === 1
-        }
+      propsCheck(result, 'read');
     }
-    if (results.length === 1 && typeof results === 'object') {
-        results = results[0];
+    if (results.length === 1) {
+      results = results[0];
     }
+  }
+
 
     return results
 }
@@ -108,35 +118,35 @@ const save = async ({destination, data, options, overrideCrudMode, notify = true
 };
 
 const buildUrl = (query, destination) => {
-    let url = query && query.hasOwnProperty('url') ? query['url'] : destination;
-    if (query && query['urlParams']) {
-        url += '?';
-        for (const [key, value] of Object.entries(query['urlParams'])) {
-            url += `${key}=${value}&`;
-        }
-        url = strings.truncate(url, 1);
+  let url = query && query.hasOwnProperty('url') ? query['url'] : destination;
+  if (query && query['urlParams']) {
+    url += '?';
+    for (const [key, value] of Object.entries(query['urlParams'])) {
+      url += `${key}=${value}&`;
     }
-    return url;
+    url = strings.truncate(url, 1);
+  }
+  return url;
 };
 
 const c = async ({destination, data, crudMode: overrideCrudMode}) => {
-    let localCrudMode = crudModeCheck(overrideCrudMode);
-    data = sanitizeData(data);
+  let localCrudMode = crudModeCheck(overrideCrudMode);
+  data = sanitizeData(data);
 
-    switch (localCrudMode) {
-        case crudModes.endpoint:
-            return await api.post(destination, data);
-        case crudModes.url:
-            break;
-        case crudModes.sequelize:
-            return await window.db.create(destination, data);
-    }
+  switch (localCrudMode) {
+    case crudModes.endpoint:
+      return await api.post(destination, data);
+    case crudModes.url:
+      break;
+    case crudModes.sequelize:
+      return await window.db.create(destination, data);
+  }
 };
 const r = async ({destination, query, crudMode: overrideCrudMode} = {}) => {
-    query = sanitizeData(query)
-    if (!destination) {
-        throw new Error('No destination given');
-    }
+  query = sanitizeData(query)
+  if (!destination) {
+    throw new Error('No destination given');
+  }
 
     let results;
     const localCrudMode = crudModeCheck(overrideCrudMode);
@@ -155,33 +165,33 @@ const r = async ({destination, query, crudMode: overrideCrudMode} = {}) => {
     }
 };
 const u = async ({destination, data, overrideCrudMode}) => {
-    const localCrudMode = crudModeCheck(overrideCrudMode);
-    data = sanitizeData(data);
-    switch (localCrudMode) {
-        case crudModes.endpoint:
-            const results = await api.patch(destination, data);
-            break;
-        case crudModes.url:
-            break;
-        case crudModes.sequelize:
-            return await window.db.update(destination, data);
-    }
+  const localCrudMode = crudModeCheck(overrideCrudMode);
+  data = sanitizeData(data);
+  switch (localCrudMode) {
+    case crudModes.endpoint:
+      const results = await api.patch(destination, data);
+      break;
+    case crudModes.url:
+      break;
+    case crudModes.sequelize:
+      return await window.db.update(destination, data);
+  }
 };
 const d = async ({destination, id, crudMode}) => {
-    crudMode = crudModeCheck(crudMode);
-    try {
-        switch (crudMode) {
-            case crudModes.endpoint:
-                break;
-            case crudModes.url:
-                const url = buildUrl({urlParams: {id: id}}, destination);
-                return await api.delete(url);
-            case crudModes.sequelize:
-                return await window.db.delete(destination, id);
-        }
-    } catch (e) {
-        return e;
+  crudMode = crudModeCheck(crudMode);
+  try {
+    switch (crudMode) {
+      case crudModes.endpoint:
+        break;
+      case crudModes.url:
+        const url = buildUrl({urlParams: {id: id}}, destination);
+        return await api.delete(url);
+      case crudModes.sequelize:
+        return await window.db.delete(destination, id);
     }
+  } catch (e) {
+    return e;
+  }
 };
 
 // ----------------------------------------------------------------------------------------------------------
@@ -195,62 +205,62 @@ const getById = async () => {
 // ----------------------------------------------------------------------------------------------------------
 
 const crudModeCheck = (localCrudMode) => {
-    if (
-        localCrudMode != null &&
-        localCrudMode !== '' &&
-        localCrudMode !== undefined
-    ) {
-        return localCrudMode;
-    }
-    if (crudMode.value !== '') {
-        return crudMode.value;
-    }
-    throw new Error('No valid crud mode');
+  if (
+    localCrudMode != null &&
+    localCrudMode !== '' &&
+    localCrudMode !== undefined
+  ) {
+    return localCrudMode;
+  }
+  if (crudMode.value !== '') {
+    return crudMode.value;
+  }
+  throw new Error('No valid crud mode');
 };
 
 const sanitizeData = (data) => {
-    if (!data) return
-    if (data.hasOwnProperty('isActive')) {
-        data.isActive = data.isActive ? 1 : 0
-    }
-    return JSON.parse(JSON.stringify(data));
+  if (!data) return
+  if (data.hasOwnProperty('isActive')) {
+    data.isActive = data.isActive ? 1 : 0
+  }
+  return JSON.parse(JSON.stringify(data));
 };
 
 const methods = {
-    c,
-    create: c,
-    r,
-    read: r,
-    u,
-    update: u,
-    d,
-    delete: d,
-    readAll,
-    readFirst,
-    readByColumnId,
-    readAllByQuery,
-    readByPk,
-    readCount,
-    save,
+  c,
+  create: c,
+  r,
+  read: r,
+  u,
+  update: u,
+  d,
+  delete: d,
+  readAll,
+  readFirst,
+  readByColumnId,
+  readAllByQuery,
+  readByPk,
+  readCount,
+  save,
 };
 
 export default methods;
 
 export {
-    crudModes,
-    crudMode,
-    methods,
-    c,
-    r,
-    u,
-    d,
-    save,
-    readAll,
-    readFirst,
-    readAllByQuery,
-    readByPk,
-    readCount,
-    count,
-    getAll,
-    readByColumnId
+  crudModes,
+  crudMode,
+  methods,
+  c,
+  r,
+  u,
+  d,
+  save,
+  readAll,
+  readFirst,
+  readAllByQuery,
+  readByPk,
+  readCount,
+  count,
+  getAll,
+  readByColumnId
 };
