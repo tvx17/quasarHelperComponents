@@ -45,11 +45,16 @@ const readChecks = (results) => {
 const helper = {}
 
 
-const readAll = async ({destination, overrideCrudMode}) => {
-    return await r({
+const readAll = async ({destination, overrideCrudMode, orderBy}) => {
+  const query = {mode: 'readAll'};
+  if (orderBy) {
+    query['orderBy'] = orderBy
+  }
+
+  return await r({
         destination: destination,
         overrideCrudMode: overrideCrudMode,
-        query: {mode: 'readAll'},
+        query: query,
     });
 };
 const readFirst = async ({destination, overrideCrudMode}) => {
@@ -59,11 +64,20 @@ const readFirst = async ({destination, overrideCrudMode}) => {
         query: {mode: 'readFirst'},
     });
 };
-const readAllByQuery = async ({destination, overrideCrudMode}) => {
-    return await r({
+const readAllByQuery = async ({destination, overrideCrudMode, query, orderBy}) => {
+  const localQuery = {}
+  localQuery['mode'] = 'readAllByQuery';
+  if(query) {
+    localQuery['where'] = query
+  }
+  if(orderBy) {
+    localQuery['orderBy'] = orderBy
+  }
+
+  return await r({
         destination: destination,
         overrideCrudMode: overrideCrudMode,
-        query: {mode: 'readAllByQuery'},
+        query: localQuery
     });
 };
 const readByPk = async ({destination, pkValue, overrideCrudMode}) => {
@@ -179,6 +193,7 @@ const u = async ({destination, data, overrideCrudMode}) => {
 };
 const d = async ({destination, id, crudMode}) => {
   crudMode = crudModeCheck(crudMode);
+  console.log('Delete', destination, id)
   try {
     switch (crudMode) {
       case crudModes.endpoint:
