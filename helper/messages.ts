@@ -1,5 +1,5 @@
-import { Dialog } from 'quasar';
-import { Notify } from 'quasar';
+import {Dialog} from 'quasar';
+import {Notify} from 'quasar';
 
 enum types {
   info = 'info',
@@ -15,15 +15,15 @@ interface IGenericNotifyParams {
 }
 
 const genericNotify = ({
-  message,
-  type = types.positive,
-  okButton = false,
-}: IGenericNotifyParams): void => {
+                         message,
+                         type = types.positive,
+                         okButton = false,
+                       }: IGenericNotifyParams): void => {
   const actions = [];
   let timeout = 1000;
 
   if (okButton) {
-    actions.push({ label: 'OK', color: 'white' });
+    actions.push({label: 'OK', color: 'white'});
     timeout = 0;
   }
 
@@ -41,25 +41,25 @@ const infoNotify = (message = ''): void => {
   if (message === '') {
     message = 'Information';
   }
-  genericNotify({ message: message, type: types.info });
+  genericNotify({message: message, type: types.info});
 };
 const ongoingNotify = (message = ''): void => {
   if (message === '') {
     message = 'Ongoing';
   }
-  genericNotify({ message: message, type: types.ongoing });
+  genericNotify({message: message, type: types.ongoing});
 };
 const positiveNotify = (message = ''): void => {
   if (message === '') {
     message = 'Successful';
   }
-  genericNotify({ message: message, type: types.positive });
+  genericNotify({message: message, type: types.positive});
 };
 const negativeNotify = (message = ''): void => {
   if (message === '') {
     message = 'Unsuccessful';
   }
-  genericNotify({ message: message, type: types.negative, okButton: true });
+  genericNotify({message: message, type: types.negative, okButton: true});
 };
 const axiosErrorNotify = (errorObject: object) => {
   let text = 'Error during server request<br/>';
@@ -79,7 +79,7 @@ const axiosErrorNotify = (errorObject: object) => {
         break;
       case '1048':
         text += 'A column that needs to have a value has got no value. Please check the column.';
-        text += '('+errorObject.response.data.detail+')';
+        text += '(' + errorObject.response.data.detail + ')';
       default:
         text += errorObject.response.data.detail;
     }
@@ -121,6 +121,30 @@ const commonDialogAsync = async (title = '', message = '') => {
   });
   return await promise;
 };
+const optionsDialogAsync = async (title = '', message = '', items = []) => {
+  const promise = new Promise((resolve, reject) => {
+    Dialog.create({
+      title: title,
+      message: message,
+      options: {
+        type: 'radio',
+        model: 'newType',
+        items: items
+      },
+      cancel: true,
+      persistent: true
+    }).onOk(async (data) => {
+      resolve(data);
+    })
+      .onCancel(async () => {
+        resolve(false);
+      })
+      .onDismiss(() => {
+        resolve(false);
+      });
+  });
+  return await promise;
+};
 const commonDialog = (title = '', message = '') => {
   Dialog.create({
     title: title,
@@ -133,7 +157,8 @@ const commonDialog = (title = '', message = '') => {
     persistent: true,
   });
 };
-const messageDialog = (message: string) => {};
+const messageDialog = (message: string) => {
+};
 const newDialogAsync = async (title = '', message = '') => {
   if (title == null) {
     // title = t('messages.newTitle');
@@ -157,7 +182,8 @@ const newDialogAsync = async (title = '', message = '') => {
   });
   return await promise;
 };
-const editDialog = () => {};
+const editDialog = () => {
+};
 const deleteDialogAsync = async (title: string, message: string): Promise<boolean> => {
   const promise: Promise<boolean> = new Promise((resolve, reject) => {
     Dialog.create({
@@ -183,6 +209,7 @@ const dialogs = {
   newAsync: newDialogAsync,
   edit: editDialog,
   deleteAsync: deleteDialogAsync,
+  optionsAsync: optionsDialogAsync,
 };
 
 const messages = {
@@ -207,4 +234,5 @@ export {
   deleteDialogAsync,
   commonDialog,
   commonDialogAsync,
+  optionsDialogAsync
 };
