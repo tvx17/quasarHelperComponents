@@ -1,10 +1,10 @@
-import {dialogs, notifies} from "src/app/messages";
-import {verbosity} from "./config";
+import {dialogs, notifies} from './messages';
+import {verbosity} from './config';
 
 const log = ({message, level = 'info', dialog = false, notify = false, v = false}) => {
   if (!v && !verbosity.app) return
-  let messagePlain = (typeof message === 'string') ? message : message[0]
-  let messageHtml = (typeof message === 'string') ? message : message[1]
+  const messagePlain = (typeof message === 'string') ? message : message[0]
+  const messageHtml = (typeof message === 'string') ? message : message[1]
 
   if (level === 'info') {
     console.log(messagePlain);
