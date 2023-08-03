@@ -53,7 +53,7 @@ const props = defineProps({
   modelValue: { required: true },
   label: { required: true, type: String },
   rules: { required: false, type: Array, default: () => [] },
-  errorMessage: { required: false, type: String },
+  errorMessage: { required: false, type: String, default: '' },
   disable: { required: false, type: Boolean, default: false },
   labelColumnWidth: { required: false, type: Number, default: 3 },
   fieldColumnWidth: { required: false, type: Number, default: 9 },

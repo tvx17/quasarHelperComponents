@@ -5,9 +5,10 @@ import {api} from 'boot/axios';
 import {ref} from 'vue';
 
 const crudModes = {
-    endpoint: 'endpoint',
-    url: 'url',
-    sequelize: 'sequelize',
+  endpoint: 'endpoint',
+  url: 'url',
+  sequelize: 'sequelize',
+  public: 'public',
 };
 
 let crudMode = ref('');
@@ -39,7 +40,7 @@ const readChecks = (results) => {
   }
 
 
-    return results
+  return results
 }
 
 const helper = {}
@@ -52,83 +53,83 @@ const readAll = async ({destination, overrideCrudMode, orderBy}) => {
   }
 
   return await r({
-        destination: destination,
-        overrideCrudMode: overrideCrudMode,
-        query: query,
-    });
+    destination: destination,
+    overrideCrudMode: overrideCrudMode,
+    query: query,
+  });
 };
 const readFirst = async ({destination, overrideCrudMode}) => {
-    return await r({
-        destination: destination,
-        overrideCrudMode: overrideCrudMode,
-        query: {mode: 'readFirst'},
-    });
+  return await r({
+    destination: destination,
+    overrideCrudMode: overrideCrudMode,
+    query: {mode: 'readFirst'},
+  });
 };
 const readAllByQuery = async ({destination, overrideCrudMode, query, orderBy}) => {
   const localQuery = {}
   localQuery['mode'] = 'readAllByQuery';
-  if(query) {
+  if (query) {
     localQuery['where'] = query
   }
-  if(orderBy) {
+  if (orderBy) {
     localQuery['orderBy'] = orderBy
   }
 
   return await r({
-        destination: destination,
-        overrideCrudMode: overrideCrudMode,
-        query: localQuery
-    });
+    destination: destination,
+    overrideCrudMode: overrideCrudMode,
+    query: localQuery
+  });
 };
 const readByPk = async ({destination, pkValue, overrideCrudMode}) => {
-    return await r({
-        destination: destination,
-        overrideCrudMode: overrideCrudMode,
-        query: {mode: 'readByPk', id: pkValue},
-    })
+  return await r({
+    destination: destination,
+    overrideCrudMode: overrideCrudMode,
+    query: {mode: 'readByPk', id: pkValue},
+  })
 };
 const readByColumnId = async ({destination, column, value, overrideCrudMode}) => {
-    return await r({
-        destination: destination,
-        overrideCrudMode: overrideCrudMode,
-        query: {mode: 'readByColumnId', where: {[column]: value}}
-    });
+  return await r({
+    destination: destination,
+    overrideCrudMode: overrideCrudMode,
+    query: {mode: 'readByColumnId', where: {[column]: value}}
+  });
 }
 const readCount = async ({destination, overrideCrudMode}) => {
-    return await r({
-        destination: destination,
-        overrideCrudMode: overrideCrudMode,
-        query: {mode: 'readCount'},
-    });
+  return await r({
+    destination: destination,
+    overrideCrudMode: overrideCrudMode,
+    query: {mode: 'readCount'},
+  });
 };
 
 const save = async ({destination, data, options, overrideCrudMode, notify = true}) => {
-    /*optionsElement = '';*/
-    if (data.hasOwnProperty('id')) {
-        try {
-            await u({
-                destination: destination,
-                data: data,
-                overrideCrudMode: overrideCrudMode,
-            });
-            if (notify) notifies.positive('Changes where saved!');
-            return null;
-        } catch (e) {
-            if (notify) notifies.axiosError(e);
-        }
-    } else {
-        try {
-            const returnData = await c({
-                destination: destination,
-                data: data,
-                overrideCrudMode: overrideCrudMode,
-            });
-            if (notify) notifies.positive('New dataset was saved!');
-            return returnData;
-        } catch (e) {
-            if (notify) notifies.axiosError(e);
-        }
+  /*optionsElement = '';*/
+  if (data.hasOwnProperty('id')) {
+    try {
+      await u({
+        destination: destination,
+        data: data,
+        overrideCrudMode: overrideCrudMode,
+      });
+      if (notify) notifies.positive('Changes where saved!');
+      return null;
+    } catch (e) {
+      if (notify) notifies.axiosError(e);
     }
+  } else {
+    try {
+      const returnData = await c({
+        destination: destination,
+        data: data,
+        overrideCrudMode: overrideCrudMode,
+      });
+      if (notify) notifies.positive('New dataset was saved!');
+      return returnData;
+    } catch (e) {
+      if (notify) notifies.axiosError(e);
+    }
+  }
 };
 
 const buildUrl = (query, destination) => {
@@ -154,6 +155,8 @@ const c = async ({destination, data, crudMode: overrideCrudMode}) => {
       break;
     case crudModes.sequelize:
       return await window.db.create(destination, data);
+    case crudModes.public:
+      throw new Error('Not supported for creating');
   }
 };
 const r = async ({destination, query, crudMode: overrideCrudMode} = {}) => {
@@ -162,21 +165,23 @@ const r = async ({destination, query, crudMode: overrideCrudMode} = {}) => {
     throw new Error('No destination given');
   }
 
-    let results;
-    const localCrudMode = crudModeCheck(overrideCrudMode);
-    try {
-        switch (localCrudMode) {
-            case crudModes.endpoint:
-                return readChecks(await api.get(destination, query))
-            case crudModes.url:
-                let url = buildUrl(query, destination);
-                return readChecks(await api.get(url))
-            case crudModes.sequelize:
-                return readChecks(await window.db.read(destination, query));
-        }
-    } catch (e) {
-        return null;
+  let results;
+  const localCrudMode = crudModeCheck(overrideCrudMode);
+  try {
+    switch (localCrudMode) {
+      case crudModes.endpoint:
+        return readChecks(await api.get(destination, query))
+      case crudModes.url:
+        let url = buildUrl(query, destination);
+        return readChecks(await api.get(url))
+      case crudModes.sequelize:
+        return readChecks(await window.db.read(destination, query));
+      case crudModes.public:
+        return await api.get(destination)
     }
+  } catch (e) {
+    return null;
+  }
 };
 const u = async ({destination, data, overrideCrudMode}) => {
   const localCrudMode = crudModeCheck(overrideCrudMode);
@@ -189,6 +194,8 @@ const u = async ({destination, data, overrideCrudMode}) => {
       break;
     case crudModes.sequelize:
       return await window.db.update(destination, data);
+    case crudModes.public:
+      throw new Error('Not supported for updating');
   }
 };
 const d = async ({destination, id, crudMode}) => {
@@ -203,6 +210,9 @@ const d = async ({destination, id, crudMode}) => {
         return await api.delete(url);
       case crudModes.sequelize:
         return await window.db.delete(destination, id);
+      case crudModes.public:
+        throw new Error('Not supported for deleting');
+
     }
   } catch (e) {
     return e;
