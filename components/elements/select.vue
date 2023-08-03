@@ -17,6 +17,8 @@
             dense
             emit-value
             map-options
+            :use-chips="props.useChips"
+            :multiple="props.multiple"
             :option-label="props.optionLabel"
             :option-value="props.optionValue"
             :disable="props.disable"
@@ -48,6 +50,8 @@ const props = defineProps({
   optionValue: { required: false, type: String, default: 'id' },
   labelColumnWidth: { required: false, type: Number, default: 3 },
   fieldColumnWidth: { required: false, type: Number, default: 9 },
+  multiple: { required: false, type: Boolean, default: false },
+  useChips: { required: false, type: Boolean, default: false }
 });
 const emits = defineEmits(['update:modelValue']);
 
