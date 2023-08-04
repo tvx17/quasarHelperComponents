@@ -198,7 +198,7 @@ const u = async ({destination, data, overrideCrudMode}) => {
       throw new Error('Not supported for updating');
   }
 };
-const d = async ({destination, id, crudMode}) => {
+const d = async ({destination, id, crudMode, query}) => {
   crudMode = crudModeCheck(crudMode);
   console.log('Delete', destination, id)
   try {
@@ -209,7 +209,10 @@ const d = async ({destination, id, crudMode}) => {
         const url = buildUrl({urlParams: {id: id}}, destination);
         return await api.delete(url);
       case crudModes.sequelize:
-        return await window.db.delete(destination, id);
+        if(query === undefined && id === undefined) {
+          throw new Error('You need to provide either an id or a query. Both variables where undefined')
+        }
+        return await window.db.delete(destination, id !== undefined ? id : query);
       case crudModes.public:
         throw new Error('Not supported for deleting');
 
