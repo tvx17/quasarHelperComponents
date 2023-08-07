@@ -4,6 +4,10 @@ import {strings} from './helper';
 import {api} from 'boot/axios';
 import {ref} from 'vue';
 
+/**
+ *
+ * @type {{endpoint: string, public: string, sequelize: string, url: string}}
+ */
 const crudModes = {
   endpoint: 'endpoint',
   url: 'url',
@@ -11,8 +15,18 @@ const crudModes = {
   public: 'public',
 };
 
+/**
+ *
+ * @type {Ref<UnwrapRef<string>>}
+ */
 let crudMode = ref('');
 
+/**
+ *
+ * @param data
+ * @param type
+ * @returns {{isActive}|*}
+ */
 const propsCheck = (data, type) => {
   if (type === 'read') {
     if (data.hasOwnProperty('isActive')) {
@@ -22,6 +36,11 @@ const propsCheck = (data, type) => {
   return data
 }
 
+/**
+ *
+ * @param results
+ * @returns {Array}
+ */
 const readChecks = (results) => {
   if (results.hasOwnProperty('data')) {
     results = results['data'];
@@ -43,9 +62,20 @@ const readChecks = (results) => {
   return results
 }
 
+/**
+ *
+ * @type {{}}
+ */
 const helper = {}
 
 
+/**
+ *
+ * @param destination
+ * @param overrideCrudMode
+ * @param orderBy
+ * @returns {Promise<Array|axios.AxiosResponse<any>|null|undefined>}
+ */
 const readAll = async ({destination, overrideCrudMode, orderBy}) => {
   const query = {mode: 'readAll'};
   if (orderBy) {
@@ -58,6 +88,13 @@ const readAll = async ({destination, overrideCrudMode, orderBy}) => {
     query: query,
   });
 };
+
+/**
+ *
+ * @param destination
+ * @param overrideCrudMode
+ * @returns {Promise<Array|axios.AxiosResponse<any>|null|undefined>}
+ */
 const readFirst = async ({destination, overrideCrudMode}) => {
   return await r({
     destination: destination,
@@ -65,6 +102,14 @@ const readFirst = async ({destination, overrideCrudMode}) => {
     query: {mode: 'readFirst'},
   });
 };
+/**
+ *
+ * @param destination
+ * @param overrideCrudMode
+ * @param query
+ * @param orderBy
+ * @returns {Promise<Array|axios.AxiosResponse<any>|null|undefined>}
+ */
 const readAllByQuery = async ({destination, overrideCrudMode, query, orderBy}) => {
   const localQuery = {}
   localQuery['mode'] = 'readAllByQuery';
@@ -81,6 +126,13 @@ const readAllByQuery = async ({destination, overrideCrudMode, query, orderBy}) =
     query: localQuery
   });
 };
+/**
+ *
+ * @param destination
+ * @param pkValue
+ * @param overrideCrudMode
+ * @returns {Promise<Array|axios.AxiosResponse<any>|null|undefined>}
+ */
 const readByPk = async ({destination, pkValue, overrideCrudMode}) => {
   return await r({
     destination: destination,
@@ -88,6 +140,14 @@ const readByPk = async ({destination, pkValue, overrideCrudMode}) => {
     query: {mode: 'readByPk', id: pkValue},
   })
 };
+/**
+ *
+ * @param destination
+ * @param column
+ * @param value
+ * @param overrideCrudMode
+ * @returns {Promise<Array|axios.AxiosResponse<any>|null|undefined>}
+ */
 const readByColumnId = async ({destination, column, value, overrideCrudMode}) => {
   return await r({
     destination: destination,
@@ -95,6 +155,12 @@ const readByColumnId = async ({destination, column, value, overrideCrudMode}) =>
     query: {mode: 'readByColumnId', where: {[column]: value}}
   });
 }
+/**
+ *
+ * @param destination
+ * @param overrideCrudMode
+ * @returns {Promise<Array|axios.AxiosResponse<any>|null|undefined>}
+ */
 const readCount = async ({destination, overrideCrudMode}) => {
   return await r({
     destination: destination,
@@ -103,6 +169,15 @@ const readCount = async ({destination, overrideCrudMode}) => {
   });
 };
 
+/**
+ *
+ * @param destination
+ * @param data
+ * @param options
+ * @param overrideCrudMode
+ * @param notify
+ * @returns {Promise<axios.AxiosResponse<any>|*|null>}
+ */
 const save = async ({destination, data, options, overrideCrudMode, notify = true}) => {
   /*optionsElement = '';*/
   if (data.hasOwnProperty('id')) {
@@ -132,6 +207,12 @@ const save = async ({destination, data, options, overrideCrudMode, notify = true
   }
 };
 
+/**
+ *
+ * @param query
+ * @param destination
+ * @returns {string|*}
+ */
 const buildUrl = (query, destination) => {
   let url = query && query.hasOwnProperty('url') ? query['url'] : destination;
   if (query && query['urlParams']) {
@@ -144,6 +225,13 @@ const buildUrl = (query, destination) => {
   return url;
 };
 
+/**
+ *
+ * @param destination
+ * @param data
+ * @param overrideCrudMode
+ * @returns {Promise<axios.AxiosResponse<any>|*>}
+ */
 const c = async ({destination, data, crudMode: overrideCrudMode}) => {
   let localCrudMode = crudModeCheck(overrideCrudMode);
   data = sanitizeData(data);
@@ -159,6 +247,14 @@ const c = async ({destination, data, crudMode: overrideCrudMode}) => {
       throw new Error('Not supported for creating');
   }
 };
+
+/**
+ *
+ * @param destination
+ * @param query
+ * @param overrideCrudMode
+ * @returns {Promise<axios.AxiosResponse<any>|Array|null>}
+ */
 const r = async ({destination, query, crudMode: overrideCrudMode} = {}) => {
   query = sanitizeData(query)
   if (!destination) {
@@ -183,6 +279,13 @@ const r = async ({destination, query, crudMode: overrideCrudMode} = {}) => {
     return null;
   }
 };
+/**
+ *
+ * @param destination
+ * @param data
+ * @param overrideCrudMode
+ * @returns {Promise<*>}
+ */
 const u = async ({destination, data, overrideCrudMode}) => {
   const localCrudMode = crudModeCheck(overrideCrudMode);
   data = sanitizeData(data);
@@ -198,6 +301,14 @@ const u = async ({destination, data, overrideCrudMode}) => {
       throw new Error('Not supported for updating');
   }
 };
+/**
+ *
+ * @param destination
+ * @param id
+ * @param crudMode
+ * @param query
+ * @returns {Promise<axios.AxiosResponse<any>|*|void>}
+ */
 const d = async ({destination, id, crudMode, query}) => {
   crudMode = crudModeCheck(crudMode);
   try {
@@ -222,16 +333,34 @@ const d = async ({destination, id, crudMode, query}) => {
 };
 
 // ----------------------------------------------------------------------------------------------------------
+/**
+ *
+ * @returns {Promise<void>}
+ */
 const count = async () => {
 };
+
+/**
+ *
+ * @returns {Promise<void>}
+ */
 const getAll = async () => {
 };
+/**
+ *
+ * @returns {Promise<void>}
+ */
 const getById = async () => {
 };
 
 // ----------------------------------------------------------------------------------------------------------
 
-const crudModeCheck = (localCrudMode) => {
+/**
+ *
+ * @param localCrudMode
+ * @returns string
+ */
+const crudModeCheck = (localCrudMode: string): string => {
   if (
     localCrudMode != null &&
     localCrudMode !== '' &&
@@ -245,6 +374,11 @@ const crudModeCheck = (localCrudMode) => {
   throw new Error('No valid crud mode');
 };
 
+/**
+ *
+ * @param data
+ * @returns {any}
+ */
 const sanitizeData = (data) => {
   if (!data) return
   if (data.hasOwnProperty('isActive')) {
@@ -253,6 +387,10 @@ const sanitizeData = (data) => {
   return JSON.parse(JSON.stringify(data));
 };
 
+/**
+ *
+ * @type {{c: ((function({destination: *, data: *, crudMode: *}): Promise<axios.AxiosResponse<*>|*>)|*), read: ((function({destination: *, query: *, crudMode: *}=): Promise<axios.AxiosResponse<*>|Array|null>)|*), d: ((function({destination: *, id: *, crudMode: *, query: *}): Promise<axios.AxiosResponse<*>|*|void>)|*), readAllByQuery: (function({destination: *, overrideCrudMode: *, query: *, orderBy: *}): Promise<axios.AxiosResponse<*>|Array|null>), readFirst: (function({destination: *, overrideCrudMode: *}): Promise<axios.AxiosResponse<*>|Array|null>), save: ((function({destination: *, data: *, options: *, overrideCrudMode: *, notify?: boolean}): Promise<axios.AxiosResponse<*>|*|null>)|*), update: ((function({destination: *, data: *, overrideCrudMode: *}): Promise<*>)|*), readByColumnId: (function({destination: *, column: *, value: *, overrideCrudMode: *}): Promise<axios.AxiosResponse<*>|Array|null>), readByPk: (function({destination: *, pkValue: *, overrideCrudMode: *}): Promise<axios.AxiosResponse<*>|Array|null>), readCount: (function({destination: *, overrideCrudMode: *}): Promise<axios.AxiosResponse<*>|Array|null>), delete: ((function({destination: *, id: *, crudMode: *, query: *}): Promise<axios.AxiosResponse<*>|*|void>)|*), readAll: (function({destination: *, overrideCrudMode: *, orderBy: *}): Promise<axios.AxiosResponse<*>|Array|null>), r: ((function({destination: *, query: *, crudMode: *}=): Promise<axios.AxiosResponse<*>|Array|null>)|*), u: ((function({destination: *, data: *, overrideCrudMode: *}): Promise<*>)|*), create: ((function({destination: *, data: *, crudMode: *}): Promise<axios.AxiosResponse<*>|*>)|*)}}
+ */
 const methods = {
   c,
   create: c,
@@ -271,8 +409,14 @@ const methods = {
   save,
 };
 
+/**
+ *
+ */
 export default methods;
 
+/**
+ *
+ */
 export {
   crudModes,
   crudMode,

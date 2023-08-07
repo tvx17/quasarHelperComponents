@@ -1,6 +1,14 @@
 import {dialogs, notifies} from './messages';
 import {verbosity} from './config';
 
+/**
+ *
+ * @param message
+ * @param level
+ * @param dialog
+ * @param notify
+ * @param v
+ */
 const log = ({message, level = 'info', dialog = false, notify = false, v = false}) => {
   if (!v && !verbosity.app) return
   const messagePlain = (typeof message === 'string') ? message : message[0]
@@ -22,6 +30,14 @@ const log = ({message, level = 'info', dialog = false, notify = false, v = false
     dialogs.common('LogMessage', messageHtml);
   }
 }
+
+/**
+ *
+ * @param errorObject
+ * @param dialog
+ * @param notify
+ * @param v
+ */
 const error = ({errorObject, dialog = false, notify = false, v = false}) => {
   let htmlMessage = ''
   if (notify) htmlMessage += `<b>${errorObject.name}</b><hr/>`;
@@ -44,6 +60,12 @@ const error = ({errorObject, dialog = false, notify = false, v = false}) => {
   log({message: [plainMessage, htmlMessage], dialog: dialog, notify: notify, level: 'error', v: v});
 }
 
+/**
+ *
+ * @param method
+ * @param file
+ * @param v
+ */
 const notImplemented = ({method, file, v = false}) => {
   if (!method && !file) {
     methods.log({message: `Not implemented`, level: 'warning'});
@@ -52,10 +74,19 @@ const notImplemented = ({method, file, v = false}) => {
   methods.log({message: `Method "${method}"  in file "${file}" is not implemented`, level: 'warning'});
 }
 
+/**
+ *
+ */
 const methods = {
   log, notImplemented, error
 }
 
+/**
+ *
+ */
 export default methods
 
+/**
+ *
+ */
 export {log, notImplemented, methods, error}
