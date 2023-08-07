@@ -93,10 +93,7 @@ const onSelect = (elementIndex) => {
 };
 
 onMounted(() =>{
-  console.log('START')
   elementData.value = props.modelValue
-  console.log(elementData.value)
-
 
   if(Object.keys(elementData.value).length !== Object.keys(props.data).length) {
     for(const key of Object.keys(props.data)) {

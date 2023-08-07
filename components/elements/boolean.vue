@@ -50,10 +50,8 @@ const elementValue = computed({
 
 watch(()=>elementValue.value, (newValue) => {
   if(newValue){
-    console.log('JA')
     emits('update:setTrue');
   } else {
-    console.log('NEIN')
     emits('update:setFalse');
   }
 });

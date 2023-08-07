@@ -200,7 +200,6 @@ const u = async ({destination, data, overrideCrudMode}) => {
 };
 const d = async ({destination, id, crudMode, query}) => {
   crudMode = crudModeCheck(crudMode);
-  console.log('Delete', destination, id)
   try {
     switch (crudMode) {
       case crudModes.endpoint:

@@ -97,8 +97,6 @@ const load = async (id = null) => {
 
   }
 
-  console.log(data.id)
-
   summary.value = data.summary
   rowId.value = data.id
 }
